@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ambil Nomor Antrian — BPS Kabupaten Toli-Toli</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#003d82;--navy2:#002966;--blue:#1565c0;--blue2:#0277bd;
+  --gold:#f9a825;--gold2:#ffc107;
+  --bg:#eef2f7;--card:#fff;
+  --text:#1a2332;--muted:#5a6a7e;
+  --border:#d1dce8;
+  --green:#2e7d32;--green2:#e8f5e9;
+  --red:#c62828;
+  --shadow:0 4px 24px rgba(0,61,130,.13);
+  --r:12px;
+}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+
+/* ─── HEADER ─── */
+header{background:linear-gradient(135deg,var(--navy2) 0%,var(--navy) 60%,var(--blue) 100%);color:#fff;box-shadow:0 2px 12px rgba(0,0,0,.35)}
+.hdr-top{background:rgba(0,0,0,.22);padding:7px 30px;font-size:12px;display:flex;justify-content:space-between;align-items:center}
+.hdr-top a{color:var(--gold2);text-decoration:none;margin-left:18px;font-weight:600}
+.hdr-top a:hover{text-decoration:underline}
+.hdr-main{display:flex;align-items:center;gap:18px;padding:14px 30px}
+.logo{width:72px;height:72px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:3px solid var(--gold);overflow:hidden}
+.logo img{width:100%;height:100%;object-fit:contain}
+.logo-txt{font-size:18px;font-weight:900;color:var(--navy);letter-spacing:-1px}
+.hdr-info h1{font-size:20px;font-weight:800;margin-bottom:2px}
+.hdr-info p{font-size:13px;opacity:.85}
+.hdr-band{height:4px;background:linear-gradient(to right,var(--gold),var(--gold2),rgba(255,255,255,.1))}
+
+/* ─── STEPS ─── */
+.steps-wrap{display:flex;justify-content:center;align-items:center;padding:28px 20px 10px;gap:0}
+.step-item{display:flex;align-items:center;gap:8px}
+.step-num{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;background:#c9d6e3;color:#fff;transition:.3s;flex-shrink:0}
+.step-lbl{font-size:13px;color:var(--muted);font-weight:500;white-space:nowrap}
+.step-item.active .step-num{background:var(--navy)}
+.step-item.active .step-lbl{color:var(--navy);font-weight:700}
+.step-item.done .step-num{background:var(--green)}
+.step-item.done .step-lbl{color:var(--green)}
+.step-line{width:45px;height:2px;background:#c9d6e3;margin:0 4px}
+
+/* ─── MAIN ─── */
+main{max-width:820px;width:100%;margin:18px auto 40px;padding:0 16px;flex:1}
+
+/* ─── CARD ─── */
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:32px;margin-bottom:16px}
+.card-ttl{font-size:19px;font-weight:800;color:var(--navy);margin-bottom:6px}
+.card-sub{color:var(--muted);font-size:14px;margin-bottom:26px}
+
+/* ─── SERVICE BUTTONS ─── */
+.svc-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.svc-btn{border:2px solid var(--border);border-radius:var(--r);padding:28px 20px;text-align:center;cursor:pointer;transition:.25s;background:#fff;position:relative;user-select:none}
+.svc-btn:hover{border-color:var(--navy);background:#edf4ff;transform:translateY(-4px);box-shadow:0 8px 28px rgba(0,61,130,.18)}
+.svc-btn:active{transform:translateY(-1px)}
+.svc-btn .s-icon{font-size:52px;margin-bottom:14px;display:block;line-height:1}
+.svc-btn .s-ttl{font-size:16px;font-weight:800;color:var(--navy);margin-bottom:6px}
+.svc-btn .s-desc{font-size:12px;color:var(--muted);line-height:1.6}
+.svc-badge{position:absolute;top:10px;right:10px;background:var(--gold);color:var(--navy2);font-size:10px;font-weight:800;padding:2px 9px;border-radius:20px;letter-spacing:.5px}
+
+/* ─── SUB-SERVICE ─── */
+.sub-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.sub-btn{border:2px solid var(--border);border-radius:10px;padding:22px 14px;text-align:center;cursor:pointer;transition:.25s;background:#fff}
+.sub-btn:hover{border-color:var(--navy);background:#edf4ff;transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,61,130,.15)}
+.sub-btn .s-icon{font-size:40px;margin-bottom:10px;display:block}
+.sub-btn .s-ttl{font-size:13px;font-weight:700;color:var(--navy);line-height:1.4}
+.sub-btn .s-code{font-size:11px;color:var(--muted);margin-top:5px;background:#eef2f7;display:inline-block;padding:2px 8px;border-radius:20px;font-weight:600}
+
+/* ─── FORM ─── */
+.f-group{margin-bottom:18px}
+.f-label{display:block;font-size:14px;font-weight:700;color:var(--text);margin-bottom:7px}
+.f-label span{color:#e53e3e}
+.f-ctrl{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:8px;font-size:15px;font-family:inherit;color:var(--text);transition:.2s;background:#fff}
+.f-ctrl:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(0,61,130,.1)}
+textarea.f-ctrl{resize:vertical;min-height:80px}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+
+/* ─── BUTTONS ─── */
+.btn{padding:13px 24px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;border:none;transition:.25s;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary{background:var(--navy);color:#fff}
+.btn-primary:hover{background:var(--navy2);box-shadow:0 4px 16px rgba(0,61,130,.4);transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--navy);border:2px solid var(--navy)}
+.btn-ghost:hover{background:#edf4ff}
+.btn-gold{background:var(--gold);color:var(--navy2)}
+.btn-gold:hover{background:var(--gold2);transform:translateY(-1px)}
+
+/* ─── ALERT ─── */
+.alert{padding:13px 17px;border-radius:8px;font-size:14px;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.alert-info{background:#e3f2fd;border-left:4px solid var(--navy);color:var(--navy2)}
+.alert-success{background:var(--green2);border-left:4px solid var(--green);color:var(--green)}
+
+/* ─── TICKET ─── */
+.ticket-wrap{max-width:420px;margin:0 auto}
+.ticket{border:2.5px dashed #b0bec5;border-radius:var(--r);overflow:hidden}
+.tk-head{background:linear-gradient(135deg,var(--navy2),var(--navy));color:#fff;padding:20px 24px;text-align:center}
+.tk-head .th-sub{font-size:11px;letter-spacing:2px;opacity:.8;text-transform:uppercase;margin-bottom:3px}
+.tk-head h2{font-size:17px;font-weight:800}
+.tk-head h3{font-size:13px;font-weight:600;opacity:.9;margin-top:2px}
+.tk-divider{display:flex;align-items:center;background:#fff}
+.tk-divider::before,.tk-divider::after{content:'';flex:1;height:2px;background:repeating-linear-gradient(90deg,transparent,transparent 4px,var(--border) 4px,var(--border) 8px)}
+.tk-divider .circle{width:20px;height:20px;border-radius:50%;background:var(--bg);border:2px solid var(--border);flex-shrink:0;margin:0 -10px}
+.tk-body{padding:24px 24px 20px;text-align:center;background:#fff}
+.tk-label{font-size:12px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+.tk-number{font-size:78px;font-weight:900;color:var(--navy);line-height:1;letter-spacing:3px;margin:4px 0 8px}
+.tk-service{font-size:15px;font-weight:700;color:var(--blue);margin-bottom:18px;background:#edf4ff;display:inline-block;padding:4px 16px;border-radius:20px}
+.tk-info{background:var(--bg);border-radius:8px;padding:14px 16px;text-align:left}
+.tk-row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px dashed var(--border)}
+.tk-row:last-child{border-bottom:none;padding-bottom:0}
+.tk-row .k{color:var(--muted)}
+.tk-row .v{font-weight:700;color:var(--text);text-align:right;max-width:60%}
+.tk-foot{background:var(--gold);padding:12px;text-align:center;font-size:13px;font-weight:800;color:var(--navy2)}
+.tk-actions{display:flex;gap:14px;margin-top:22px}
+
+/* ─── MISC ─── */
+.hidden{display:none!important}
+.divider{display:flex;align-items:center;gap:14px;margin:22px 0;color:var(--muted);font-size:13px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ─── ANIMATE ─── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+.anim{animation:fadeUp .38s ease both}
+
+/* ─── FOOTER ─── */
+footer{background:var(--navy2);color:rgba(255,255,255,.65);text-align:center;padding:18px;font-size:12px;margin-top:auto}
+footer a{color:var(--gold2);text-decoration:none;font-weight:600}
+footer a:hover{text-decoration:underline}
+
+/* ─── PRINT ─── */
+@media print{
+  header,footer,.steps-wrap,.tk-actions,.card-ttl,.card-sub,.alert,.hdr-top,.hdr-band{display:none!important}
+  body{background:#fff}
+  main{margin:0;padding:0;max-width:100%}
+  .card{box-shadow:none;padding:10px}
+  .ticket-wrap,.ticket{max-width:100%}
+}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:600px){
+  .svc-grid,.sub-grid{grid-template-columns:1fr}
+  .f-row{grid-template-columns:1fr}
+  .hdr-main{padding:12px 14px}
+  .hdr-info h1{font-size:16px}
+  main{margin:12px auto 28px}
+  .card{padding:20px}
+  .step-lbl{display:none}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-top">
+    <span>📍 BPS Kabupaten Toli-Toli, Sulawesi Tengah</span>
+    <span>
+      <a href="display.html" target="_blank">🖥️ Layar Antrian</a>
+      <a href="officer.html" target="_blank">👤 Petugas</a>
+    </span>
+  </div>
+  <div class="hdr-main">
+    <div class="logo"><span class="logo-txt">BPS</span></div>
+    <div class="hdr-info">
+      <h1>Sistem Antrian Digital</h1>
+      <p>Badan Pusat Statistik Kabupaten Toli-Toli</p>
+    </div>
+  </div>
+  <div class="hdr-band"></div>
+</header>
+
+<!-- STEPS INDICATOR -->
+<div class="steps-wrap" id="stepsWrap">
+  <div class="step-item active" id="si1">
+    <div class="step-num">1</div>
+    <div class="step-lbl">Pilih Layanan</div>
+  </div>
+  <div class="step-line"></div>
+  <div class="step-item" id="si2">
+    <div class="step-num">2</div>
+    <div class="step-lbl">Data Diri</div>
+  </div>
+  <div class="step-line"></div>
+  <div class="step-item" id="si3">
+    <div class="step-num">3</div>
+    <div class="step-lbl">Nomor Antrian</div>
+  </div>
+</div>
+
+<main>
+
+  <!-- STEP 1A: Pilih Jenis Layanan Utama -->
+  <div class="card anim" id="s1a">
+    <div class="card-ttl">🏛️ Pilih Jenis Layanan</div>
+    <div class="card-sub">Silakan pilih jenis layanan yang Anda butuhkan hari ini</div>
+    <div class="svc-grid">
+      <div class="svc-btn" onclick="pickMain('pst')">
+        <div class="svc-badge">PST</div>
+        <span class="s-icon">📊</span>
+        <div class="s-ttl">Pelayanan Statistik Terpadu</div>
+        <div class="s-desc">Konsultasi data statistik, perpustakaan statistik, dan rekomendasi statistik resmi BPS</div>
+      </div>
+      <div class="svc-btn" onclick="pickMain('lainnya')">
+        <span class="s-icon">📋</span>
+        <div class="s-ttl">Pelayanan Lainnya</div>
+        <div class="s-desc">Layanan umum, administrasi, dan keperluan lainnya di luar Pelayanan Statistik Terpadu</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 1B: Sub-layanan PST -->
+  <div class="card anim hidden" id="s1b">
+    <div class="card-ttl">📊 Pelayanan Statistik Terpadu</div>
+    <div class="card-sub">Pilih jenis pelayanan yang Anda perlukan</div>
+    <div class="sub-grid">
+      <div class="sub-btn" onclick="pickSub('K','Konsultasi Statistik')">
+        <span class="s-icon">💬</span>
+        <div class="s-ttl">Konsultasi Statistik</div>
+        <div class="s-code">Kode: K-001</div>
+      </div>
+      <div class="sub-btn" onclick="pickSub('P','Perpustakaan Statistik')">
+        <span class="s-icon">📚</span>
+        <div class="s-ttl">Perpustakaan Statistik</div>
+        <div class="s-code">Kode: P-001</div>
+      </div>
+      <div class="sub-btn" onclick="pickSub('R','Rekomendasi Statistik')">
+        <span class="s-icon">📝</span>
+        <div class="s-ttl">Rekomendasi Statistik</div>
+        <div class="s-code">Kode: R-001</div>
+      </div>
+    </div>
+    <br>
+    <button class="btn btn-ghost" onclick="back(1)" style="margin-top:6px">← Kembali</button>
+  </div>
+
+  <!-- STEP 2: Form Data Diri -->
+  <div class="card anim hidden" id="s2">
+    <div class="card-ttl">📝 Isi Data Diri</div>
+    <div class="card-sub">Harap isi data diri dengan lengkap dan benar</div>
+    <div class="alert alert-info" id="svcAlert">
+      ℹ️ Layanan dipilih: <strong id="svcLabel">–</strong>
+    </div>
+    <form id="qForm" onsubmit="submitForm(event)" novalidate>
+      <div class="f-row">
+        <div class="f-group">
+          <label class="f-label">Nama Lengkap <span>*</span></label>
+          <input class="f-ctrl" id="fNama" type="text" placeholder="Nama sesuai identitas" required>
+        </div>
+        <div class="f-group">
+          <label class="f-label">No. HP / Telepon <span>*</span></label>
+          <input class="f-ctrl" id="fHp" type="tel" placeholder="Contoh: 08123456789" required>
+        </div>
+      </div>
+      <div class="f-row">
+        <div class="f-group">
+          <label class="f-label">Instansi / Asal <span>*</span></label>
+          <input class="f-ctrl" id="fInstansi" type="text" placeholder="Nama instansi atau asal daerah" required>
+        </div>
+        <div class="f-group">
+          <label class="f-label">Jenis Kelamin <span>*</span></label>
+          <select class="f-ctrl" id="fJK" required>
+            <option value="">-- Pilih --</option>
+            <option>Laki-laki</option>
+            <option>Perempuan</option>
+          </select>
+        </div>
+      </div>
+      <div class="f-group">
+        <label class="f-label">Keperluan / Keterangan <span>*</span></label>
+        <textarea class="f-ctrl" id="fKeperluan" rows="3" placeholder="Jelaskan singkat keperluan Anda" required></textarea>
+      </div>
+      <div id="formErr" class="alert" style="display:none;background:#fce4e4;border-left:4px solid #c62828;color:#b71c1c;margin-top:4px"></div>
+      <div style="display:flex;gap:14px;margin-top:8px">
+        <button type="button" class="btn btn-ghost" onclick="back(2)" style="flex:1">← Kembali</button>
+        <button type="submit" class="btn btn-primary" style="flex:2">Ambil Nomor Antrian →</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- STEP 3: Tiket -->
+  <div class="card anim hidden" id="s3">
+    <div class="card-ttl">✅ Nomor Antrian Berhasil Diambil</div>
+    <div class="card-sub">Silakan simpan atau cetak tiket Anda dan tunggu panggilan petugas</div>
+    <div class="alert alert-success">
+      🎉 Selamat! Nomor antrian Anda sudah tercatat. Harap menunggu di ruang tunggu.
+    </div>
+    <div class="ticket-wrap">
+      <div class="ticket" id="ticketEl">
+        <div class="tk-head">
+          <div class="th-sub">Tiket Antrian Resmi</div>
+          <h2>BADAN PUSAT STATISTIK</h2>
+          <h3>Kabupaten Toli-Toli, Sulawesi Tengah</h3>
+        </div>
+        <div class="tk-divider"><div class="circle"></div></div>
+        <div class="tk-body">
+          <div class="tk-label">Nomor Antrian Anda</div>
+          <div class="tk-number" id="tkNum">K-001</div>
+          <div class="tk-service" id="tkSvc">Konsultasi Statistik</div>
+          <div class="tk-info">
+            <div class="tk-row"><span class="k">Nama</span><span class="v" id="tkNama">–</span></div>
+            <div class="tk-row"><span class="k">No. HP</span><span class="v" id="tkHp">–</span></div>
+            <div class="tk-row"><span class="k">Instansi</span><span class="v" id="tkInst">–</span></div>
+            <div class="tk-row"><span class="k">Tanggal</span><span class="v" id="tkTgl">–</span></div>
+            <div class="tk-row"><span class="k">Waktu Ambil</span><span class="v" id="tkWkt">–</span></div>
+            <div class="tk-row"><span class="k">Antrian Sebelum Anda</span><span class="v" id="tkWait">–</span></div>
+          </div>
+        </div>
+        <div class="tk-divider"><div class="circle"></div></div>
+        <div class="tk-foot">⏳ Harap menunggu, kami akan segera memanggil Anda</div>
+      </div>
+      <div class="tk-actions">
+        <button class="btn btn-ghost" onclick="window.print()" style="flex:1">🖨️ Cetak</button>
+        <button class="btn btn-primary" onclick="resetFlow()" style="flex:2">🏠 Kembali ke Beranda</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  © 2024 Badan Pusat Statistik Kabupaten Toli-Toli &nbsp;|&nbsp;
+  <a href="display.html" target="_blank">🖥️ Layar Antrian</a> &nbsp;|&nbsp;
+  <a href="officer.html" target="_blank">👤 Dashboard Petugas</a> &nbsp;|&nbsp;
+  <a href="admin.html" target="_blank">🔐 Admin</a>
+</footer>
+
+<script src="js/state.js"></script>
+<script>
+let selCode = '', selName = '';
+
+function show(id){
+  ['s1a','s1b','s2','s3'].forEach(x=>document.getElementById(x).classList.add('hidden'));
+  const el = document.getElementById(id);
+  el.classList.remove('hidden');
+  el.classList.remove('anim');
+  void el.offsetWidth;
+  el.classList.add('anim');
+}
+
+function setStep(n){
+  [1,2,3].forEach(i=>{
+    const el=document.getElementById('si'+i);
+    el.classList.remove('active','done');
+    if(i<n) el.classList.add('done');
+    else if(i===n) el.classList.add('active');
+  });
+}
+
+function pickMain(type){
+  if(type==='pst'){
+    show('s1b');
+    setStep(1);
+  } else {
+    selCode='L'; selName='Pelayanan Lainnya';
+    document.getElementById('svcLabel').textContent=selName;
+    show('s2');
+    setStep(2);
+  }
+}
+
+function pickSub(code,name){
+  selCode=code; selName=name;
+  document.getElementById('svcLabel').textContent=selName;
+  show('s2');
+  setStep(2);
+}
+
+function back(from){
+  if(from===1){show('s1a');setStep(1);}
+  else if(from===2){
+    if(selCode==='L'){show('s1a');setStep(1);}
+    else{show('s1b');setStep(1);}
+  }
+}
+
+function submitForm(e){
+  e.preventDefault();
+  const nama=document.getElementById('fNama').value.trim();
+  const hp=document.getElementById('fHp').value.trim();
+  const inst=document.getElementById('fInstansi').value.trim();
+  const jk=document.getElementById('fJK').value;
+  const kep=document.getElementById('fKeperluan').value.trim();
+  const err=document.getElementById('formErr');
+
+  if(!nama||!hp||!inst||!jk||!kep){
+    err.textContent='⚠️ Harap isi semua kolom yang bertanda bintang (*)';
+    err.style.display='flex';
+    return;
+  }
+  if(!/^[0-9+\-\s]{8,15}$/.test(hp)){
+    err.textContent='⚠️ Format nomor HP tidak valid. Contoh: 08123456789';
+    err.style.display='flex';
+    return;
+  }
+  err.style.display='none';
+
+  const q = addQueue({
+    code:selCode, name:nama, phone:hp,
+    institution:inst, gender:jk, purpose:kep
+  });
+
+  const now = new Date();
+  document.getElementById('tkNum').textContent  = q.id;
+  document.getElementById('tkSvc').textContent  = q.typeName;
+  document.getElementById('tkNama').textContent = q.name;
+  document.getElementById('tkHp').textContent   = q.phone;
+  document.getElementById('tkInst').textContent = q.institution;
+  document.getElementById('tkTgl').textContent  = now.toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('tkWkt').textContent  = now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  document.getElementById('tkWait').textContent = q.waitingBefore > 0 ? `${q.waitingBefore} orang` : 'Tidak ada — Anda pertama!';
+
+  show('s3');
+  setStep(3);
+  document.getElementById('qForm').reset();
+}
+
+function resetFlow(){
+  selCode=''; selName='';
+  show('s1a');
+  setStep(1);
+}
+</script>
+</body>
+</html>

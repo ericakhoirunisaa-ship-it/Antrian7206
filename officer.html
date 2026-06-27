@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Petugas — BPS Kabupaten Toli-Toli</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#003d82;--navy2:#002966;--navy3:#001f5c;
+  --blue:#1565c0;--blue2:#0277bd;
+  --gold:#f9a825;--gold2:#ffc107;
+  --bg:#eef2f7;--card:#fff;
+  --text:#1a2332;--muted:#5a6a7e;
+  --border:#d1dce8;
+  --green:#2e7d32;--green2:#e8f5e9;--green3:#00c853;
+  --red:#c62828;--red2:#fce4e4;
+  --orange:#e65100;--orange2:#fff3e0;
+  --shadow:0 4px 24px rgba(0,61,130,.13);
+  --r:10px;
+}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+
+/* ─── HEADER ─── */
+header{background:linear-gradient(135deg,var(--navy3),var(--navy),var(--blue));color:#fff;box-shadow:0 2px 12px rgba(0,0,0,.35)}
+.hdr-top{background:rgba(0,0,0,.22);padding:7px 28px;font-size:12px;display:flex;justify-content:space-between}
+.hdr-main{display:flex;align-items:center;justify-content:space-between;padding:14px 28px}
+.hl{display:flex;align-items:center;gap:14px}
+.logo{width:62px;height:62px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--gold);flex-shrink:0}
+.logo-t{font-size:16px;font-weight:900;color:var(--navy);letter-spacing:-1px}
+.hdr-ttl h1{font-size:19px;font-weight:800}
+.hdr-ttl p{font-size:12px;opacity:.8}
+.hr-links{display:flex;gap:12px}
+.hr-links a{color:rgba(255,255,255,.85);text-decoration:none;font-size:13px;background:rgba(255,255,255,.15);padding:6px 14px;border-radius:6px;font-weight:600}
+.hr-links a:hover{background:rgba(255,255,255,.25)}
+.hdr-band{height:4px;background:linear-gradient(to right,var(--gold),var(--gold2),rgba(255,255,255,.1))}
+
+/* ─── LAYOUT ─── */
+.layout{display:grid;grid-template-columns:320px 1fr;gap:0;flex:1}
+.sidebar{background:#fff;border-right:1px solid var(--border);padding:22px 18px;display:flex;flex-direction:column;gap:18px;min-height:calc(100vh - 115px)}
+.main-area{padding:22px 22px 40px;display:flex;flex-direction:column;gap:18px}
+
+/* ─── PANEL ─── */
+.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;box-shadow:0 2px 10px rgba(0,61,130,.06)}
+.panel-ttl{font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.panel-ttl::before{content:'';width:3px;height:14px;background:var(--navy);border-radius:2px;display:block}
+
+/* ─── OFFICER SETUP ─── */
+.ofc-status{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:12px 14px;background:var(--bg);border-radius:8px}
+.ofc-avatar{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--blue));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.ofc-info-name{font-size:15px;font-weight:700;color:var(--navy)}
+.ofc-info-email{font-size:12px;color:var(--muted)}
+.ofc-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;margin-top:4px}
+.ofc-badge.on{background:#e8f5e9;color:var(--green)}
+.ofc-badge.off{background:#fce4e4;color:var(--red)}
+
+.f-group{margin-bottom:12px}
+.f-lbl{font-size:13px;font-weight:700;color:var(--text);margin-bottom:5px;display:block}
+.f-ctrl{width:100%;padding:10px 12px;border:2px solid var(--border);border-radius:7px;font-size:14px;font-family:inherit;color:var(--text);transition:.2s}
+.f-ctrl:focus{outline:none;border-color:var(--navy)}
+.btn-save{width:100%;padding:11px;background:var(--navy);color:#fff;border:none;border-radius:7px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:.2s}
+.btn-save:hover{background:var(--navy2)}
+
+/* ─── SUMMARY CARDS ─── */
+.summary-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.sum-card{border-radius:var(--r);padding:16px;text-align:center;position:relative;overflow:hidden}
+.sum-card.k{background:linear-gradient(135deg,#e3f2fd,#bbdefb);border:1px solid #90caf9}
+.sum-card.p{background:linear-gradient(135deg,#f3e5f5,#e1bee7);border:1px solid #ce93d8}
+.sum-card.r{background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border:1px solid #a5d6a7}
+.sum-card.l{background:linear-gradient(135deg,#fff3e0,#ffe0b2);border:1px solid #ffcc80}
+.sum-code{font-size:26px;font-weight:900;line-height:1}
+.sum-card.k .sum-code{color:#1565c0}
+.sum-card.p .sum-code{color:#7b1fa2}
+.sum-card.r .sum-code{color:var(--green)}
+.sum-card.l .sum-code{color:var(--orange)}
+.sum-lbl{font-size:11px;font-weight:600;margin:4px 0 2px;color:var(--muted)}
+.sum-count{font-size:30px;font-weight:900;color:var(--text)}
+.sum-sub{font-size:11px;color:var(--muted)}
+
+/* ─── CURRENT SERVING ─── */
+.cur-panel{border-left:4px solid var(--gold);background:linear-gradient(135deg,#fffde7,#fff8e1);border-color:var(--gold)}
+.cur-empty{color:var(--muted);font-style:italic;font-size:14px;padding:8px 0}
+.cur-content{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center}
+.cur-num{font-size:52px;font-weight:900;color:var(--navy);letter-spacing:3px;line-height:1;font-variant-numeric:tabular-nums}
+.cur-info .ci-name{font-size:18px;font-weight:800;color:var(--text)}
+.cur-info .ci-svc{font-size:13px;color:var(--blue);font-weight:600;margin:3px 0}
+.cur-info .ci-detail{font-size:12px;color:var(--muted)}
+.cur-actions{display:flex;flex-direction:column;gap:8px}
+
+/* ─── BUTTONS ─── */
+.btn{padding:10px 18px;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:.2s;font-family:inherit;display:inline-flex;align-items:center;gap:6px;justify-content:center;white-space:nowrap}
+.btn-primary{background:var(--navy);color:#fff}
+.btn-primary:hover{background:var(--navy2);transform:translateY(-1px)}
+.btn-success{background:var(--green);color:#fff}
+.btn-success:hover{background:#1b5e20}
+.btn-warning{background:var(--orange);color:#fff}
+.btn-warning:hover{background:#bf360c}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:hover{background:#b71c1c}
+.btn-ghost{background:transparent;color:var(--navy);border:2px solid var(--navy)}
+.btn-ghost:hover{background:#edf4ff}
+.btn-call{background:var(--navy);color:#fff;font-size:12px;padding:7px 12px}
+.btn-call:hover{background:var(--navy2)}
+.btn-done{background:var(--green);color:#fff;font-size:12px;padding:7px 12px}
+.btn-done:hover{background:#1b5e20}
+.btn-skip{background:transparent;color:var(--muted);border:1.5px solid var(--border);font-size:12px;padding:7px 12px}
+.btn-skip:hover{background:var(--bg);color:var(--text)}
+.btn-next{width:100%;padding:12px;border-radius:8px;font-size:14px;display:flex;align-items:center;justify-content:space-between}
+
+/* ─── TABS ─── */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:16px}
+.tab{padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--muted);transition:.2s;display:flex;align-items:center;gap:6px}
+.tab:hover{color:var(--navy)}
+.tab.active{color:var(--navy);border-color:var(--navy)}
+.tab .badge{background:var(--navy);color:#fff;font-size:10px;padding:1px 7px;border-radius:20px;font-weight:800}
+.tab.active .badge{background:var(--gold);color:var(--navy2)}
+
+/* ─── TABLE ─── */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--bg);padding:10px 12px;text-align:left;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--muted);white-space:nowrap;border-bottom:2px solid var(--border)}
+tbody tr{border-bottom:1px solid var(--border);transition:.15s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#f8faff}
+tbody td{padding:10px 12px;vertical-align:middle}
+.td-id{font-size:15px;font-weight:900;color:var(--navy);font-variant-numeric:tabular-nums}
+.td-name{font-weight:700}
+.td-sub{font-size:11px;color:var(--muted)}
+.td-actions{display:flex;gap:6px;white-space:nowrap}
+
+/* Status badge */
+.status-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800}
+.status-badge.waiting{background:#e3f2fd;color:#1565c0}
+.status-badge.serving{background:#fff3e0;color:var(--orange)}
+.status-badge.done{background:var(--green2);color:var(--green)}
+.status-badge.skip{background:#f5f5f5;color:var(--muted)}
+
+/* ─── EMPTY STATE ─── */
+.empty-state{text-align:center;padding:36px;color:var(--muted)}
+.empty-state .es-icon{font-size:44px;margin-bottom:12px}
+.empty-state p{font-size:14px}
+
+/* ─── NEXT BUTTONS ─── */
+.next-panel .btn-next{margin-bottom:8px}
+.next-panel .btn-next:last-child{margin-bottom:0}
+
+/* ─── ALERT ─── */
+.alert{padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:14px}
+.alert-info{background:#e3f2fd;border-left:3px solid var(--navy);color:var(--navy2)}
+
+/* ─── MISC ─── */
+.hidden{display:none!important}
+footer{background:var(--navy2);color:rgba(255,255,255,.6);text-align:center;padding:14px;font-size:12px;margin-top:auto}
+footer a{color:var(--gold2);text-decoration:none;font-weight:600}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.anim{animation:fadeUp .3s ease both}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{min-height:auto;border-right:none;border-bottom:1px solid var(--border)}
+  .summary-row{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .summary-row{grid-template-columns:1fr 1fr}
+  .hdr-main{flex-direction:column;align-items:flex-start;gap:10px}
+  .hr-links{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-top">
+    <span>Dashboard Petugas — BPS Kabupaten Toli-Toli</span>
+    <span id="hdrTime">–</span>
+  </div>
+  <div class="hdr-main">
+    <div class="hl">
+      <div class="logo"><span class="logo-t">BPS</span></div>
+      <div class="hdr-ttl">
+        <h1>Dashboard Petugas Antrian</h1>
+        <p>Badan Pusat Statistik Kabupaten Toli-Toli</p>
+      </div>
+    </div>
+    <div class="hr-links">
+      <a href="index.html" target="_blank">📱 Kiosk Antrian</a>
+      <a href="display.html" target="_blank">🖥️ Layar Display</a>
+      <a href="#" onclick="confirmReset()" style="background:rgba(198,40,40,.5)">🔄 Reset Hari Ini</a>
+    </div>
+  </div>
+  <div class="hdr-band"></div>
+</header>
+
+<div class="layout">
+
+  <!-- ── SIDEBAR ── -->
+  <div class="sidebar">
+
+    <!-- Officer Status -->
+    <div class="panel">
+      <div class="panel-ttl">Identitas Petugas</div>
+      <div class="ofc-status" id="ofcStatus">
+        <div class="ofc-avatar">👤</div>
+        <div>
+          <div class="ofc-info-name" id="ofcDisplayName">Belum diisi</div>
+          <div class="ofc-info-email" id="ofcDisplayEmail">–</div>
+          <div class="ofc-badge off" id="ofcBadge">⚫ Tidak Aktif</div>
+        </div>
+      </div>
+      <div class="f-group">
+        <label class="f-lbl">Nama Petugas</label>
+        <input class="f-ctrl" id="inOfficerName" type="text" placeholder="Masukkan nama lengkap">
+      </div>
+      <div class="f-group">
+        <label class="f-lbl">Email Petugas</label>
+        <input class="f-ctrl" id="inOfficerEmail" type="email" placeholder="nama@bps.go.id">
+      </div>
+      <button class="btn-save" onclick="saveOfficer()">💾 Simpan &amp; Aktifkan</button>
+    </div>
+
+    <!-- Panggil Berikutnya per layanan -->
+    <div class="panel next-panel">
+      <div class="panel-ttl">Panggil Berikutnya</div>
+      <button class="btn btn-primary btn-next" onclick="callNext('K')">
+        <span>💬 Konsultasi Statistik</span>
+        <span id="waitK">–</span>
+      </button>
+      <button class="btn btn-primary btn-next" onclick="callNext('P')" style="background:#7b1fa2">
+        <span>📚 Perpustakaan Statistik</span>
+        <span id="waitP">–</span>
+      </button>
+      <button class="btn btn-primary btn-next" onclick="callNext('R')" style="background:var(--green)">
+        <span>📝 Rekomendasi Statistik</span>
+        <span id="waitR">–</span>
+      </button>
+      <button class="btn btn-primary btn-next" onclick="callNext('L')" style="background:var(--orange)">
+        <span>📋 Pelayanan Lainnya</span>
+        <span id="waitL">–</span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ── MAIN AREA ── -->
+  <div class="main-area">
+
+    <!-- Summary cards -->
+    <div class="summary-row anim">
+      <div class="sum-card k">
+        <div class="sum-code">K</div>
+        <div class="sum-lbl">Konsultasi</div>
+        <div class="sum-count" id="sumK">0</div>
+        <div class="sum-sub" id="sumKsub">menunggu</div>
+      </div>
+      <div class="sum-card p">
+        <div class="sum-code">P</div>
+        <div class="sum-lbl">Perpustakaan</div>
+        <div class="sum-count" id="sumP">0</div>
+        <div class="sum-sub" id="sumPsub">menunggu</div>
+      </div>
+      <div class="sum-card r">
+        <div class="sum-code">R</div>
+        <div class="sum-lbl">Rekomendasi</div>
+        <div class="sum-count" id="sumR">0</div>
+        <div class="sum-sub" id="sumRsub">menunggu</div>
+      </div>
+      <div class="sum-card l">
+        <div class="sum-code">L</div>
+        <div class="sum-lbl">Lainnya</div>
+        <div class="sum-count" id="sumL">0</div>
+        <div class="sum-sub" id="sumLsub">menunggu</div>
+      </div>
+    </div>
+
+    <!-- Currently serving -->
+    <div class="panel cur-panel anim">
+      <div class="panel-ttl">Sedang Dilayani Sekarang</div>
+      <div id="curEmpty" class="cur-empty">Belum ada antrian yang dipanggil. Gunakan tombol "Panggil Berikutnya" di panel kiri.</div>
+      <div id="curContent" class="cur-content hidden">
+        <div class="cur-num" id="curNum">–</div>
+        <div class="cur-info">
+          <div class="ci-name" id="curName">–</div>
+          <div class="ci-svc" id="curSvc">–</div>
+          <div class="ci-detail" id="curDetail">–</div>
+        </div>
+        <div class="cur-actions">
+          <button class="btn btn-warning" onclick="recallCurrent()">🔔 Panggil Ulang</button>
+          <button class="btn btn-success" onclick="doneCurrent()">✅ Selesai Dilayani</button>
+          <button class="btn btn-ghost" onclick="skipCurrent()">⏭️ Lewati</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Queue table with tabs -->
+    <div class="panel anim">
+      <div class="panel-ttl">Daftar Antrian</div>
+      <div class="tabs" id="tabsEl">
+        <div class="tab active" onclick="setTab('all')" id="tab-all">Semua <span class="badge" id="tabBadgeAll">0</span></div>
+        <div class="tab" onclick="setTab('K')" id="tab-K">💬 Konsultasi <span class="badge" id="tabBadgeK">0</span></div>
+        <div class="tab" onclick="setTab('P')" id="tab-P">📚 Perpustakaan <span class="badge" id="tabBadgeP">0</span></div>
+        <div class="tab" onclick="setTab('R')" id="tab-R">📝 Rekomendasi <span class="badge" id="tabBadgeR">0</span></div>
+        <div class="tab" onclick="setTab('L')" id="tab-L">📋 Lainnya <span class="badge" id="tabBadgeL">0</span></div>
+      </div>
+      <div class="tbl-wrap">
+        <table id="queueTable">
+          <thead>
+            <tr>
+              <th style="width:80px">Kode</th>
+              <th>Nama</th>
+              <th>No. HP</th>
+              <th>Instansi</th>
+              <th>Keperluan</th>
+              <th>Waktu</th>
+              <th>Status</th>
+              <th style="width:160px">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="queueBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<footer>
+  © 2024 BPS Kabupaten Toli-Toli &nbsp;|&nbsp;
+  <a href="index.html">📱 Kiosk Antrian</a> &nbsp;|&nbsp;
+  <a href="display.html">🖥️ Layar Display</a> &nbsp;|&nbsp;
+  <a href="admin.html">🔐 Admin</a>
+</footer>
+
+<script src="js/state.js"></script>
+<script>
+let activeTab = 'all';
+
+/* ── Clock ── */
+function updateClock(){
+  document.getElementById('hdrTime').textContent =
+    new Date().toLocaleString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+setInterval(updateClock, 10000);
+updateClock();
+
+/* ── Officer ── */
+function loadOfficerUI(){
+  const state = getState();
+  const ofc = state.officer || {};
+  if(ofc.name){
+    document.getElementById('ofcDisplayName').textContent = ofc.name;
+    document.getElementById('ofcDisplayEmail').textContent = ofc.email || '–';
+    document.getElementById('ofcBadge').className = 'ofc-badge on';
+    document.getElementById('ofcBadge').textContent = '🟢 Sedang Bertugas';
+    document.getElementById('inOfficerName').value = ofc.name;
+    document.getElementById('inOfficerEmail').value = ofc.email || '';
+  }
+}
+
+function saveOfficer(){
+  const name = document.getElementById('inOfficerName').value.trim();
+  const email = document.getElementById('inOfficerEmail').value.trim();
+  if(!name){ alert('Nama petugas harus diisi.'); return; }
+  setOfficer(name, email);
+  loadOfficerUI();
+  renderAll();
+  alert('✅ Identitas petugas berhasil disimpan!');
+}
+
+/* ── Tabs ── */
+function setTab(code){
+  activeTab = code;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+code).classList.add('active');
+  renderTable();
+}
+
+/* ── Main render ── */
+function renderAll(){
+  const state = getState();
+  renderSummary(state);
+  renderCurrent(state);
+  renderTable(state);
+  renderNextButtons(state);
+}
+
+function renderSummary(state){
+  state = state || getState();
+  const codes = ['K','P','R','L'];
+  codes.forEach(c=>{
+    const waiting = state.queues.filter(q=>q.code===c && q.status==='waiting').length;
+    const total   = state.queues.filter(q=>q.code===c).length;
+    document.getElementById('sum'+c).textContent = waiting;
+    document.getElementById('sum'+c+'sub').textContent = `menunggu / ${total} total`;
+    document.getElementById('tabBadge'+c).textContent = waiting;
+  });
+  const allWaiting = state.queues.filter(q=>q.status==='waiting').length;
+  document.getElementById('tabBadgeAll').textContent = allWaiting;
+}
+
+function renderCurrent(state){
+  state = state || getState();
+  const cs = state.currentServing;
+  const empty = document.getElementById('curEmpty');
+  const content = document.getElementById('curContent');
+  if(!cs || cs.status === 'done'){
+    empty.classList.remove('hidden');
+    content.classList.add('hidden');
+  } else {
+    empty.classList.add('hidden');
+    content.classList.remove('hidden');
+    document.getElementById('curNum').textContent    = cs.id;
+    document.getElementById('curName').textContent   = cs.name;
+    document.getElementById('curSvc').textContent    = cs.typeName;
+    document.getElementById('curDetail').textContent =
+      `📞 ${cs.phone} • 🏢 ${cs.institution} • ⚧ ${cs.gender} • Dipanggil: ${formatTime(cs.calledAt)}`;
+  }
+}
+
+function renderNextButtons(state){
+  state = state || getState();
+  const codes = ['K','P','R','L'];
+  codes.forEach(c=>{
+    const cnt = state.queues.filter(q=>q.code===c && q.status==='waiting').length;
+    document.getElementById('wait'+c).textContent = cnt > 0 ? `(${cnt} menunggu)` : '(kosong)';
+  });
+}
+
+function renderTable(state){
+  state = state || getState();
+  let queues = [...state.queues].sort((a,b)=>a.createdAt - b.createdAt);
+  if(activeTab !== 'all') queues = queues.filter(q => q.code === activeTab);
+
+  const tbody = document.getElementById('queueBody');
+  if(!queues.length){
+    tbody.innerHTML = `
+      <tr><td colspan="8">
+        <div class="empty-state">
+          <div class="es-icon">📭</div>
+          <p>Belum ada antrian${activeTab!=='all'?' untuk layanan ini':''}</p>
+        </div>
+      </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = queues.map(q => {
+    const statusHtml = {
+      waiting: '<span class="status-badge waiting">⏳ Menunggu</span>',
+      serving: '<span class="status-badge serving">🔔 Dipanggil</span>',
+      done:    '<span class="status-badge done">✅ Selesai</span>',
+      skip:    '<span class="status-badge skip">⏭️ Dilewati</span>',
+    }[q.status] || '';
+
+    let actions = '';
+    if(q.status === 'waiting'){
+      actions = `
+        <div class="td-actions">
+          <button class="btn btn-call" onclick="callSpecific('${escJ(q.id)}')">📣 Panggil</button>
+          <button class="btn btn-skip" onclick="skipSpecific('${escJ(q.id)}')">⏭️</button>
+        </div>`;
+    } else if(q.status === 'serving'){
+      actions = `
+        <div class="td-actions">
+          <button class="btn btn-done" onclick="doneSpecific('${escJ(q.id)}')">✅ Selesai</button>
+          <button class="btn btn-call" onclick="callSpecific('${escJ(q.id)}')">🔔 Ulang</button>
+        </div>`;
+    } else {
+      actions = `<span style="font-size:12px;color:var(--muted)">${formatTime(q.doneAt||q.calledAt)}</span>`;
+    }
+
+    return `
+      <tr>
+        <td class="td-id">${escH(q.id)}</td>
+        <td>
+          <div class="td-name">${escH(q.name)}</div>
+          <div class="td-sub">${escH(q.typeName)}</div>
+        </td>
+        <td>${escH(q.phone)}</td>
+        <td>${escH(q.institution)}</td>
+        <td style="max-width:180px;font-size:12px;color:var(--muted)">${escH(q.purpose)}</td>
+        <td style="font-size:12px;white-space:nowrap">${formatTime(q.createdAt)}</td>
+        <td>${statusHtml}</td>
+        <td>${actions}</td>
+      </tr>`;
+  }).join('');
+}
+
+/* ── Actions ── */
+function callNext(code){
+  const state = getState();
+  const ofc = state.officer;
+  if(!ofc || !ofc.name){ alert('⚠️ Harap isi identitas petugas terlebih dahulu.'); return; }
+  const q = callNextByCode(code);
+  if(!q){ alert(`Tidak ada antrian menunggu untuk layanan ${SERVICE_MAP[code].name}.`); return; }
+  renderAll();
+}
+
+function callSpecific(id){
+  const state = getState();
+  if(!state.officer || !state.officer.name){ alert('⚠️ Harap isi identitas petugas terlebih dahulu.'); return; }
+  callQueue(id);
+  renderAll();
+}
+
+function doneCurrent(){
+  const state = getState();
+  if(!state.currentServing){ alert('Tidak ada antrian yang sedang dilayani.'); return; }
+  doneQueue(state.currentServing.id);
+  renderAll();
+}
+
+function skipCurrent(){
+  const state = getState();
+  if(!state.currentServing){ return; }
+  skipQueue(state.currentServing.id);
+  renderAll();
+}
+
+function recallCurrent(){
+  const state = getState();
+  if(!state.currentServing){ return; }
+  callQueue(state.currentServing.id);
+  renderAll();
+}
+
+function doneSpecific(id){ doneQueue(id); renderAll(); }
+function skipSpecific(id){ skipQueue(id); renderAll(); }
+
+function confirmReset(){
+  if(confirm('⚠️ Apakah Anda yakin ingin mereset semua data antrian hari ini?\nTindakan ini tidak dapat dibatalkan.')){
+    resetAll();
+    renderAll();
+    loadOfficerUI();
+  }
+}
+
+/* ── Utils ── */
+function escH(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+function escJ(s){ return String(s||'').replace(/'/g,"\\'") }
+
+/* ── Init & real-time ── */
+loadOfficerUI();
+renderAll();
+onStateChange(()=>renderAll());
+setInterval(()=>renderAll(), 2000);
+</script>
+</body>
+</html>

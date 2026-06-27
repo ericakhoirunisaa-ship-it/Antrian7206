@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Layar Antrian — BPS Kabupaten Toli-Toli</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#003d82;--navy2:#002255;--navy3:#001740;
+  --blue:#1565c0;--blue2:#0277bd;
+  --gold:#f9a825;--gold2:#ffc107;--gold3:#ffe082;
+  --bg:#011a3d;--bg2:#02204d;--bg3:#021833;
+  --card:rgba(255,255,255,.06);--card2:rgba(255,255,255,.03);
+  --border:rgba(255,255,255,.1);
+  --green:#00e676;--green2:#69f0ae;
+  --text:#fff;--muted:rgba(255,255,255,.6);
+}
+
+html,body{height:100%;overflow:hidden}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column}
+
+/* ─── TOP BAR ─── */
+.top-bar{
+  background:linear-gradient(135deg,var(--navy3),var(--navy),var(--blue2));
+  padding:0 28px;
+  display:flex;align-items:center;justify-content:space-between;
+  height:78px;flex-shrink:0;
+  border-bottom:3px solid var(--gold);
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+}
+.tb-left{display:flex;align-items:center;gap:16px}
+.tb-logo{width:52px;height:52px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid var(--gold)}
+.tb-logo-txt{font-size:15px;font-weight:900;color:var(--navy);letter-spacing:-1px}
+.tb-title h2{font-size:18px;font-weight:800;line-height:1.2}
+.tb-title p{font-size:12px;opacity:.75}
+.tb-right{text-align:right}
+.tb-clock{font-size:34px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--gold2);letter-spacing:2px;line-height:1}
+.tb-date{font-size:12px;opacity:.7;margin-top:3px}
+
+/* ─── BODY LAYOUT ─── */
+.body-layout{flex:1;display:grid;grid-template-columns:1fr 300px;min-height:0}
+
+/* ─── CENTER PANEL ─── */
+.center{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 30px;gap:18px;min-height:0}
+
+/* Serving display */
+.serving-card{
+  width:100%;max-width:600px;
+  background:var(--card);
+  border:1.5px solid var(--border);
+  border-radius:20px;
+  padding:28px 36px 32px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.serving-card::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(249,168,37,.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+.sc-calling{font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--gold2);margin-bottom:10px;font-weight:700}
+.sc-num{
+  font-size:clamp(72px,14vw,130px);font-weight:900;
+  color:#fff;letter-spacing:8px;line-height:1;
+  text-shadow:0 0 40px rgba(249,168,37,.5),0 4px 20px rgba(0,0,0,.5);
+  margin:8px 0 14px;
+  font-variant-numeric:tabular-nums;
+}
+.sc-num.empty{font-size:40px;font-weight:400;color:var(--muted);letter-spacing:2px}
+.sc-service{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--gold);color:var(--navy2);
+  padding:7px 22px;border-radius:30px;
+  font-size:15px;font-weight:800;
+  margin-bottom:12px;
+}
+.sc-name{font-size:16px;color:var(--muted);font-weight:500}
+.sc-desk{font-size:13px;margin-top:6px;color:var(--gold3);font-weight:600}
+
+/* Pulse ring animation */
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(249,168,37,.5)}
+  70%{box-shadow:0 0 0 30px rgba(249,168,37,0)}
+  100%{box-shadow:0 0 0 0 rgba(249,168,37,0)}
+}
+.serving-card.calling{animation:pulse 1.5s ease 3}
+
+/* Flip animation */
+@keyframes flipIn{
+  0%{transform:rotateX(-90deg) scale(.8);opacity:0}
+  60%{transform:rotateX(10deg) scale(1.05);opacity:.8}
+  100%{transform:rotateX(0) scale(1);opacity:1}
+}
+.sc-num.flip{animation:flipIn .55s cubic-bezier(.23,1,.32,1) both}
+
+/* Status banner */
+.status-banner{
+  width:100%;max-width:600px;
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+.sb-item{
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:12px;padding:12px 10px;text-align:center;
+}
+.sb-code{font-size:22px;font-weight:900;color:var(--gold2)}
+.sb-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:2px 0}
+.sb-count{font-size:24px;font-weight:800;color:#fff}
+.sb-item.has-queue .sb-code{color:var(--green2)}
+.sb-item.has-queue .sb-count{color:var(--green2)}
+
+/* ─── SIDEBAR ─── */
+.sidebar{
+  background:var(--bg2);border-left:1px solid var(--border);
+  display:flex;flex-direction:column;padding:18px 16px;gap:14px;min-height:0;overflow:hidden;
+}
+
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.panel-ttl{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold2);font-weight:700;margin-bottom:12px}
+
+/* Officer info */
+.ofc-name{font-size:17px;font-weight:800;margin-bottom:3px}
+.ofc-email{font-size:12px;color:var(--muted);word-break:break-all}
+.ofc-badge{display:inline-flex;align-items:center;gap:5px;background:var(--green);color:#000;font-size:10px;font-weight:800;padding:2px 10px;border-radius:20px;margin-top:6px}
+
+/* Queue list */
+.qlist{flex:1;overflow:hidden;display:flex;flex-direction:column;gap:6px}
+.ql-item{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:8px;padding:8px 12px;
+  display:flex;align-items:center;gap:10px;
+  transition:.3s;
+}
+.ql-item.top{border-color:var(--gold);background:rgba(249,168,37,.08)}
+.ql-id{font-size:16px;font-weight:900;color:var(--gold2);min-width:58px;font-variant-numeric:tabular-nums}
+.ql-info{flex:1;min-width:0}
+.ql-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ql-svc{font-size:10px;color:var(--muted)}
+.ql-time{font-size:11px;color:var(--muted);text-align:right}
+
+.ql-empty{color:var(--muted);font-size:13px;text-align:center;padding:16px 0}
+
+/* Recent served */
+.recent-list{display:flex;flex-direction:column;gap:5px}
+.rec-item{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid var(--border)}
+.rec-item:last-child{border-bottom:none}
+.rec-id{font-weight:800;color:var(--muted)}
+.rec-name{color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px}
+
+/* Marquee ticker */
+.ticker{
+  background:var(--gold);color:var(--navy2);
+  padding:8px 0;font-size:13px;font-weight:700;
+  overflow:hidden;white-space:nowrap;
+  flex-shrink:0;
+  border-top:2px solid var(--gold2);
+}
+@keyframes marquee{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+.ticker-inner{display:inline-block;animation:marquee 22s linear infinite}
+.ticker-sep{margin:0 30px;opacity:.5}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:900px){
+  .body-layout{grid-template-columns:1fr}
+  .sidebar{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="tb-left">
+    <div class="tb-logo"><span class="tb-logo-txt">BPS</span></div>
+    <div class="tb-title">
+      <h2>Badan Pusat Statistik</h2>
+      <p>Kabupaten Toli-Toli — Sistem Antrian Digital</p>
+    </div>
+  </div>
+  <div class="tb-right">
+    <div class="tb-clock" id="clockEl">--:--:--</div>
+    <div class="tb-date" id="dateEl">--</div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="body-layout">
+
+  <!-- CENTER -->
+  <div class="center">
+
+    <!-- Currently serving -->
+    <div class="serving-card" id="servingCard">
+      <div class="sc-calling" id="callingLabel">MENUNGGU NOMOR BERIKUTNYA...</div>
+      <div class="sc-num empty" id="scNum">- - -</div>
+      <div id="scServiceWrap" style="display:none">
+        <div class="sc-service" id="scService">–</div>
+        <div class="sc-name" id="scName">–</div>
+        <div class="sc-desk" id="scDesk">–</div>
+      </div>
+    </div>
+
+    <!-- Stats per service type -->
+    <div class="status-banner" id="statsBanner">
+      <div class="sb-item" id="stat-K">
+        <div class="sb-code">K</div>
+        <div class="sb-label">Konsultasi</div>
+        <div class="sb-count" id="cnt-K">0</div>
+      </div>
+      <div class="sb-item" id="stat-P">
+        <div class="sb-code">P</div>
+        <div class="sb-label">Perpustakaan</div>
+        <div class="sb-count" id="cnt-P">0</div>
+      </div>
+      <div class="sb-item" id="stat-R">
+        <div class="sb-code">R</div>
+        <div class="sb-label">Rekomendasi</div>
+        <div class="sb-count" id="cnt-R">0</div>
+      </div>
+      <div class="sb-item" id="stat-L">
+        <div class="sb-code">L</div>
+        <div class="sb-label">Lainnya</div>
+        <div class="sb-count" id="cnt-L">0</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- Officer info -->
+    <div class="panel" id="ofcPanel">
+      <div class="panel-ttl">👤 Petugas Bertugas</div>
+      <div class="ofc-name" id="ofcName">Belum ditentukan</div>
+      <div class="ofc-email" id="ofcEmail">–</div>
+      <div class="ofc-badge" id="ofcBadge" style="display:none">🟢 Sedang Bertugas</div>
+    </div>
+
+    <!-- Next in queue -->
+    <div class="panel" style="flex:1;display:flex;flex-direction:column;min-height:0">
+      <div class="panel-ttl">⏳ Menunggu Dipanggil</div>
+      <div class="qlist" id="qlistEl">
+        <div class="ql-empty">Belum ada antrian</div>
+      </div>
+    </div>
+
+    <!-- Recently served -->
+    <div class="panel">
+      <div class="panel-ttl">✅ Baru Selesai Dilayani</div>
+      <div class="recent-list" id="recentEl">
+        <div style="font-size:13px;color:var(--muted);text-align:center;padding:8px 0">–</div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- TICKER -->
+<div class="ticker">
+  <span class="ticker-inner" id="tickerInner">
+    Selamat datang di BPS Kabupaten Toli-Toli
+    <span class="ticker-sep">●</span>
+    Silakan ambil nomor antrian di loket pendaftaran
+    <span class="ticker-sep">●</span>
+    Harap tenang dan tertib selama menunggu panggilan
+    <span class="ticker-sep">●</span>
+    Jam operasional: Senin – Jumat, 08.00 – 15.30 WITA
+  </span>
+</div>
+
+<script src="js/state.js"></script>
+<script>
+/* ── Clock ── */
+function updateClock(){
+  const now=new Date();
+  document.getElementById('clockEl').textContent=now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+  document.getElementById('dateEl').textContent=now.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+setInterval(updateClock,1000);
+updateClock();
+
+/* ── State render ── */
+let lastServingId=null;
+let speechQueue=[];
+let isSpeaking=false;
+
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  speechQueue.push(text);
+  processSpeech();
+}
+
+function processSpeech(){
+  if(isSpeaking||!speechQueue.length) return;
+  isSpeaking=true;
+  const utt=new SpeechSynthesisUtterance(speechQueue.shift());
+  utt.lang='id-ID';utt.rate=0.88;utt.pitch=1;utt.volume=1;
+  utt.onend=()=>{isSpeaking=false;processSpeech()};
+  utt.onerror=()=>{isSpeaking=false;processSpeech()};
+  window.speechSynthesis.speak(utt);
+}
+
+function renderState(state){
+  /* Officer */
+  const ofc=state.officer||{};
+  const ofcName=document.getElementById('ofcName');
+  const ofcEmail=document.getElementById('ofcEmail');
+  const ofcBadge=document.getElementById('ofcBadge');
+  if(ofc.name){
+    ofcName.textContent=ofc.name;
+    ofcEmail.textContent=ofc.email||'–';
+    ofcBadge.style.display='inline-flex';
+  } else {
+    ofcName.textContent='Belum ditentukan';
+    ofcEmail.textContent='–';
+    ofcBadge.style.display='none';
+  }
+
+  /* Serving */
+  const cs=state.currentServing;
+  const scNum=document.getElementById('scNum');
+  const scSvcWrap=document.getElementById('scServiceWrap');
+  const scSvc=document.getElementById('scService');
+  const scName=document.getElementById('scName');
+  const scDesk=document.getElementById('scDesk');
+  const callingLbl=document.getElementById('callingLabel');
+  const card=document.getElementById('servingCard');
+
+  if(cs){
+    if(lastServingId!==cs.id){
+      /* New queue called */
+      lastServingId=cs.id;
+      scNum.className='sc-num flip';
+      setTimeout(()=>scNum.classList.remove('flip'),600);
+      card.classList.remove('calling');
+      void card.offsetWidth;
+      card.classList.add('calling');
+      speak(`Nomor antrian ${cs.id.replace('-',' ')}, ${cs.name}, silakan menuju ${cs.desk}`);
+    }
+    callingLbl.textContent='🔔 NOMOR ANTRIAN DIPANGGIL';
+    scNum.textContent=cs.id;
+    scNum.classList.remove('empty');
+    scSvcWrap.style.display='block';
+    scSvc.textContent=cs.typeName;
+    scName.textContent=cs.name||'';
+    scDesk.textContent='⟶  '+cs.desk;
+  } else {
+    lastServingId=null;
+    callingLbl.textContent='MENUNGGU NOMOR BERIKUTNYA...';
+    scNum.textContent='- - -';
+    scNum.className='sc-num empty';
+    scSvcWrap.style.display='none';
+  }
+
+  /* Stats */
+  const codes=['K','P','R','L'];
+  codes.forEach(c=>{
+    const waiting=state.queues.filter(q=>q.code===c&&q.status==='waiting').length;
+    document.getElementById('cnt-'+c).textContent=waiting;
+    document.getElementById('stat-'+c).classList.toggle('has-queue',waiting>0);
+  });
+
+  /* Waiting list */
+  const waiting=state.queues.filter(q=>q.status==='waiting').sort((a,b)=>a.createdAt-b.createdAt).slice(0,8);
+  const qlEl=document.getElementById('qlistEl');
+  if(waiting.length===0){
+    qlEl.innerHTML='<div class="ql-empty">Belum ada antrian menunggu</div>';
+  } else {
+    qlEl.innerHTML=waiting.map((q,i)=>`
+      <div class="ql-item ${i===0?'top':''}">
+        <div class="ql-id">${q.id}</div>
+        <div class="ql-info">
+          <div class="ql-name">${escH(q.name)}</div>
+          <div class="ql-svc">${escH(q.typeName)}</div>
+        </div>
+        <div class="ql-time">${formatTime(q.createdAt)}</div>
+      </div>`).join('');
+  }
+
+  /* Recent done */
+  const done=state.queues.filter(q=>q.status==='done').sort((a,b)=>b.doneAt-a.doneAt).slice(0,4);
+  const recEl=document.getElementById('recentEl');
+  if(done.length===0){
+    recEl.innerHTML='<div style="font-size:13px;color:var(--muted);text-align:center;padding:8px 0">–</div>';
+  } else {
+    recEl.innerHTML=done.map(q=>`
+      <div class="rec-item">
+        <span class="rec-id">${q.id}</span>
+        <span class="rec-name">${escH(q.name)}</span>
+        <span style="font-size:11px;color:var(--muted)">${formatTime(q.doneAt)}</span>
+      </div>`).join('');
+  }
+
+  /* Ticker */
+  const allWaiting=state.queues.filter(q=>q.status==='waiting').length;
+  if(allWaiting>0){
+    const ids=state.queues.filter(q=>q.status==='waiting').map(q=>q.id).join(', ');
+    document.getElementById('tickerInner').innerHTML=
+      `Selamat datang di BPS Kabupaten Toli-Toli
+       <span class="ticker-sep">●</span>
+       Antrian menunggu: ${ids}
+       <span class="ticker-sep">●</span>
+       Harap tenang dan tertib selama menunggu panggilan
+       <span class="ticker-sep">●</span>
+       Jam operasional: Senin – Jumat, 08.00 – 15.30 WITA`;
+  }
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+/* ── Init ── */
+renderState(getState());
+onStateChange(renderState);
+setInterval(()=>renderState(getState()), 1500);
+</script>
+</body>
+</html>
