@@ -160,7 +160,7 @@ footer a:hover{text-decoration:underline}
     </span>
   </div>
   <div class="hdr-main">
-    <div class="logo"><span class="logo-txt">BPS</span></div>
+    <div class="logo"><img src="logo_bps.png" alt="Logo BPS"></div>
     <div class="hdr-info">
       <h1>Sistem Antrian Digital</h1>
       <p>Badan Pusat Statistik Kabupaten Toli-Toli</p>
@@ -297,9 +297,9 @@ footer a:hover{text-decoration:underline}
           <div class="tk-number" id="tkNum">K-001</div>
           <div class="tk-service" id="tkSvc">Konsultasi Statistik</div>
           <div class="tk-info">
-            <div class="tk-row"><span class="k">Nama</span><span class="v" id="tkNama">–</span></div>
-            <div class="tk-row"><span class="k">No. HP</span><span class="v" id="tkHp">–</span></div>
-            <div class="tk-row"><span class="k">Instansi</span><span class="v" id="tkInst">–</span></div>
+            <div class="tk-row" id="tkRowNama"><span class="k">Nama</span><span class="v" id="tkNama">–</span></div>
+            <div class="tk-row" id="tkRowHp"><span class="k">No. HP</span><span class="v" id="tkHp">–</span></div>
+            <div class="tk-row" id="tkRowInst"><span class="k">Instansi</span><span class="v" id="tkInst">–</span></div>
             <div class="tk-row"><span class="k">Tanggal</span><span class="v" id="tkTgl">–</span></div>
             <div class="tk-row"><span class="k">Waktu Ambil</span><span class="v" id="tkWkt">–</span></div>
             <div class="tk-row"><span class="k">Antrian Sebelum Anda</span><span class="v" id="tkWait">–</span></div>
@@ -360,9 +360,25 @@ function pickMain(type){
 
 function pickSub(code,name){
   selCode=code; selName=name;
-  document.getElementById('svcLabel').textContent=selName;
-  show('s2');
-  setStep(2);
+  issueTicketDirect();
+}
+
+function issueTicketDirect(){
+  const q = addQueue({
+    code:selCode, name:'', phone:'',
+    institution:'', gender:'', purpose:''
+  });
+  const now = new Date();
+  document.getElementById('tkNum').textContent  = q.id;
+  document.getElementById('tkSvc').textContent  = q.typeName;
+  document.getElementById('tkTgl').textContent  = now.toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('tkWkt').textContent  = now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  document.getElementById('tkWait').textContent = q.waitingBefore > 0 ? `${q.waitingBefore} orang` : 'Tidak ada — Anda pertama!';
+  document.getElementById('tkRowNama').classList.add('hidden');
+  document.getElementById('tkRowHp').classList.add('hidden');
+  document.getElementById('tkRowInst').classList.add('hidden');
+  show('s3');
+  setStep(3);
 }
 
 function back(from){
@@ -416,6 +432,7 @@ function submitForm(e){
 
 function resetFlow(){
   selCode=''; selName='';
+  ['tkRowNama','tkRowHp','tkRowInst'].forEach(id=>document.getElementById(id).classList.remove('hidden'));
   show('s1a');
   setStep(1);
 }
